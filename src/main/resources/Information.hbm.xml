@@ -1,0 +1,22 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+
+    <class name="org.model.Information" table="information" schema="devicemanagefzl">
+        <id name="informationId">
+            <column name="InformationID" sql-type="int(11)"/>
+            <generator class="native"></generator>
+        </id>
+        <property name="informationContent">
+            <column name="InformationContent" sql-type="text" not-null="true"/>
+        </property>
+        <property name="informationImage">
+            <column name="InformationImage" sql-type="text" not-null="true"/>
+        </property>
+        <property name="infomationCreateTime">
+            <column name="InfomationCreateTime" sql-type="varchar(2555)" length="2555" not-null="true"/>
+        </property>
+    </class>
+</hibernate-mapping>

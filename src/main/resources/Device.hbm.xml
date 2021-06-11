@@ -1,0 +1,34 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+
+    <class name="org.model.Device" table="device" schema="devicemanagefzl">
+        <id name="deviceId">
+            <column name="DeviceID" sql-type="int(11)"/>
+            <generator class="native"></generator>
+        </id>
+        <property name="deviceName">
+            <column name="DeviceName" sql-type="varchar(50)" length="50" not-null="true"/>
+        </property>
+        <property name="devicePrice">
+            <column name="DevicePrice" sql-type="varchar(50)" length="50" not-null="true"/>
+        </property>
+        <many-to-one name="deviceclass" class="org.model.Deviceclass">
+            <column name="DeviceClassID" not-null="true"/>
+        </many-to-one>
+        <set name="shopingcarts" inverse="true">
+            <key>
+                <column name="DeviceID" not-null="true"/>
+            </key>
+            <one-to-many not-found="ignore" class="org.model.Shopingcart"/>
+        </set>
+        <set name="shopingorderitems" inverse="true">
+            <key>
+                <column name="DeviceID"/>
+            </key>
+            <one-to-many not-found="ignore" class="org.model.Shopingorderitem"/>
+        </set>
+    </class>
+</hibernate-mapping>

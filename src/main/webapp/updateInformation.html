@@ -26,17 +26,39 @@
         标题：<input type = "text" name = "informationTitle" id="informationTitle"><br>
         标题图片：<input type="hidden" id="informationId" name="infoId" readonly/>
         <input type="file" name = "informationImage" accept="image/*" size="60" /><br>
-        简介：<textarea name="informationBrief" rows="5" cols = "45" ></textarea><br>
+        简介：<textarea name="informationBrief" rows="5" cols = "45" id="informationBrief" ></textarea><br>
         正文：<script id="editor" type="text/plain" name = "informationMainBody"
                    style="width: 100%; height: 500px;"></script>
     </form>
 </div>
 <script type="text/javascript">
     var ue = UE.getEditor('editor');
+    $.ajax({
+        url:"http://localhost:8080/DeviceManage/findInformationById?informationId=" + $.getUrlParam('id'),
+        method:"GET",
+        success:function (data) {
+            var information = eval("(" + data + ")").result;
+            if(information){   //空值判断
+                console.log(information);
+                var imgURL = information[0].InformationContent.split('<x>')[3].split('<p>')[1];
+                imgURL = $(imgURL)[0].src; //DOM变jquery对象
+               // console.log(imgURL);
+                ue.ready(function() {
+                    ue.setContent('<img src="' + imgURL + '"/>');
+                });
+                //[^>]表示匹配除>之外的字符
+                $("#informationTitle").val(information[0].InformationContent.split('<x>')[1].replace(/<[^>]+>/,""));
+                $("#informationBrief").val(information[0].InformationContent.split('<x>')[2].replace(/<[^>]+>/,""));
+            }
+        }
+    });
+
+
 </script>
 </body>
 
-<script>
+<script type="text/javascript">
     $("#informationId").prop("value", $.getUrlParam('id'));
+
 </script>
 </html>

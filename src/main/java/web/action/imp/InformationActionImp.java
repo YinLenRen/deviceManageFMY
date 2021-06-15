@@ -80,6 +80,7 @@ public class InformationActionImp extends ActionSupport implements InformationAc
     @Override
     public String addInformation() throws IOException {
         Information information = new Information();
+      //  informationMainBody = informationMainBody
         //拼接
         String informationContent = "<x>" + informationTitle + "</x>" + "<x>" + informationBrief + "</x>" +
                 "<x>" + informationMainBody + "</x>";

@@ -4,7 +4,7 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <title>资讯列表</title>
-        <%pageContext.setAttribute("APP_PATH", request.getContextPath());%>
+    <%pageContext.setAttribute("APP_PATH", request.getContextPath());%>
     <script src="${APP_PATH}/jslib/js/jquery-1.12.4.min.js"></script>
     <!--  <script src="./jslib/js/mui.min.js"></script>
       <link href="./jslib/css/mui.min.css" rel="stylesheet"/>
@@ -54,9 +54,10 @@
         }
         span{
             float:left;
-            padding-left: 5px;
+            padding-left: 0px;
         }
         .dd {
+            padding-left: 10px;
             font-size: 10px;
             width: 730px;
             course: hand;
@@ -67,6 +68,7 @@
         .btn{
             padding:5px;
         }
+
     </style>
 </head>
 
@@ -102,7 +104,7 @@
         </button>
     </a>
     <button id="btn_delete" type="button" class="btn btn-danger" style=" margin-left: 0px">
-        <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>删除
+        <span class="glyphicon glyphicon-trash" aria-hidden="true" onclick="deleteAllInformation"></span>删除
     </button>
 </div>
 <!--<hr>-->
@@ -116,7 +118,6 @@
 </body>
 
 <script type="text/javascript">
-
     $(document).ready(function() {
         $('#information_table').DataTable({
             "destroy":true,  //不加会报错
@@ -140,15 +141,13 @@
                     render:function (data, type, row) {
                         var content = data.InformationContent;
                         var imgURL = content.split('<x>')[3].split('<p>')[1];
+
                         var html = "<div>" + "<img src='"+ $(imgURL)[0].src +"' style='float:left;'/>";
-
                         var title = content.split('<x>')[1].replace(/<[^>]+>/,"");
-                        html += "<span >" + title + "</span>";
-
-                        var brife = content.split('<x>')[2].replaces(/<[^>]+>/,"");
-                        html += "<br><span class='dd'>" + brife + "</span>";
-
-                        html += "</div>"
+                        html += title;
+                        var brife = content.split('<x>')[2].replace(/<[^>]+>/,"");
+                        html += "<p class='dd'>" + brife + "</p>";
+                        html += "</div>";
                         return html;
                     }
                 },
@@ -159,6 +158,7 @@
                     "title": "操作",
                     render: function (data, type, row) {
                         var html = "<div style='margin-top:5px;' ><button type='button' onclick= 'editInformation("+ data.InformationID +")' id='InformationID" + data.InformationID + "' class='btn bg-info'><span class='glyphicon glyphicon-pencil' aria-hidden='true'>编辑</span></button></div>";
+                        html += "<div style='margin-top:5px;' ><button type='button' onclick='lookInformation("+ data.InformationID +")' id='InformationID"+ data.InformationID +"' class='btn btn-info'><span class='glyphicon glyphicon-eye-open' aria-hidden='true'>详情</span></button></div>";
                         html += "<div style='margin-top:5px;' ><button type='button' onclick='deleteInformation("+ data.InformationID +")' id='InformationID" + data.InformationID + "' class='btn btn-danger'><span class='glyphicon glyphicon-remove' aria-hidden='true'>删除</span></button></div>";
                         var title = " <section class='content'>" + "<div class='btn-group operation'>";
                         title += html;
@@ -169,14 +169,11 @@
             ]
         });
     });
-
     function editInformation(informationId) {
         $(location).attr("href","updateInformation.html?id=" + informationId);
     }
-
     function deleteInformation(informationId){
         $("#delList").modal();
-        //输入框传值
         $("#delID").val(informationId);
     }
     $("#information_table").on("click","#check_all",function(){//给tr或者td添加click事件
@@ -184,7 +181,6 @@
         var check = $(this).prop("checked");
         $("input[type='checkbox']").prop("checked", check);
     })
-
     $("#informationBtnOfDel").click(function () {
         var id = $("#delID").val();
         $.ajax({
@@ -193,5 +189,39 @@
         });
         $("#InformationID" + id).parent().parent().parent().parent().remove();
     })
+    function lookInformation(informationId) {
+        $.ajax({
+            url:"showInformationByIdFromWebPortol.action?infoId=" + informationId,
+            method: "GET",
+            success:function () {
+                $(location).attr("href","${APP_PATH}/showInformationByIdFromWebPortol?infoId=" + informationId);
+            }
+        })
+    }
+    function deleteAllInformation() {
+        var checkIDs = new Array();
+        checkIDs = getAllCheckIDs();
+        for(var i = 0; i < checkIDs.length; ++i){
+            $.ajax({
+                url:"${APP_PATH}/deleteInformation.action?informationId=" + checkIDs[i],
+                method:"POST",
+            });
+            console.log("#del" + checkIDs[i]);
+            $("#del" + checkIDs[i]).parent().parent().remove();  //移除该列<tr></tr>
+        }
+    }
+    function getAllCheckIDs(){
+        var  checkBoxId = new Array();
+        var trNum = ($("#information_table tbody").children("tr"));
+        for(var i = 0; i < trNum.length; i++){
+            var tdArr = trNum.eq(i).find("td").eq(0);
+            if(tdArr.find("input").is(":checked")){
+                checkBoxId.push(tdArr.attr("id").substring(8));
+                //   console.log($("input[id^='checkBox']").attr("id"));
+            }
 
+        }
+        console.log(checkBoxId);
+        return checkBoxId;
+    }
 </script>

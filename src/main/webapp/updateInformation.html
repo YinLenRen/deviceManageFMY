@@ -58,20 +58,20 @@
             <tr>
                 <th>简介：</th>
                 <td>
-                <script id="briefEditor" type="text/plain" name = "informationBrief"
-                        style="width: 100%; height: 100px;"></script>
+                    <script id="briefEditor" type="text/plain" name = "informationBrief"
+                            style="width: 100%; height: 100px;"></script>
                 </td>
             </tr>
             <tr>
                 <th>正文：</th>
                 <td>
                     <script id="editor" type="text/plain" name = "informationMainBody"
-                               style="width: 100%; height: 500px;"></script>
+                            style="width: 100%; height: 500px;"></script>
                 </td>
             </tr>
             </tbody>
         </table>
-       <input type="submit" class="form-control" value="提交"><br>
+        <input type="submit" class="form-control" value="提交"><br>
     </form>
 </div>
 <script type="text/javascript">
@@ -110,8 +110,9 @@
 
     $("#informationID").prop("value", $.getUrlParam('id'));
     $("#fileinp").change(function () {
-        $("#text").html($("#fileinp").val());
-    })
+        $("#text").html($("#fileinp").val().substring(12));
+   });
+
 </script>
 </body>
 </html>

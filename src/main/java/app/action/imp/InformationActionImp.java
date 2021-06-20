@@ -126,7 +126,7 @@ public class InformationActionImp extends ActionSupport implements InformationAc
                     "<div class = 'text' style = 'text-align:center; font-size:35px'><strong>" + array[1]
                     + "</strong></div>"
                     + "<div class = 'text' style='text-align:center'>"
-                    +"<img src=\"http://localhost:8080" + information.getInformationImage() + "\"/>"
+                    + information.getInformationImage()
                     + "</div>"
                     +"<div class='text' style='text-align:right'>"
                     + information.getInfomationCreateTime()
@@ -157,7 +157,7 @@ public class InformationActionImp extends ActionSupport implements InformationAc
                     + array[1]
                     + "</strong></div>"
                     + "<div class='text' style='text-align:center'>"
-                    + "<img src=\"" + information.getInformationImage() + "\"/>"
+                    + information.getInformationImage()
                     + "</div>"
                     + "<div class='text' style='text-align:right'>"
                     + information.getInfomationCreateTime()

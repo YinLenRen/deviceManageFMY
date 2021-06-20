@@ -3,22 +3,31 @@
 
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <title>设备分类列表</title>
+    <title>资讯列表</title>
         <%pageContext.setAttribute("APP_PATH", request.getContextPath());%>
     <script src="${APP_PATH}/jslib/js/jquery-1.12.4.min.js"></script>
     <!--  <script src="./jslib/js/mui.min.js"></script>
       <link href="./jslib/css/mui.min.css" rel="stylesheet"/>
       <link rel="stylesheet" type="text/css" href="./jslib/css/app.css"/>   script不可用<script   /> -->
-    <script src="jslib/bootstrap-4.6.0-dist/js/bootstrap.js"></script>
+    <!--<link href="jslib/bootstrap-4.6.0-dist/css/bootstrap.css" rel="stylesheet">
+    <script src="jslib/bootstrap-4.6.0-dist/js/bootstrap.js"></script>-->
     <script type="text/javascript" charset="utf-8" src="./ueditor1.4.3.3/ueditor.config.js"></script>
     <script type="text/javascript" charset="utf-8" src="./ueditor1.4.3.3/ueditor.all.min.js"> </script>
     <script type="text/javascript" charset="utf-8" src="./ueditor1.4.3.3/lang/zh-cn/zh-cn.js"></script>
-    <link href="jslib/bootstrap-4.6.0-dist/css/bootstrap.css" rel="stylesheet">
+
+
+    <link href="jslib/bootstrap-3.3.7-dist/css/bootstrap.css" rel="stylesheet">
+    <script src="jslib/bootstrap-3.3.7-dist/js/bootstrap.js"></script>
+
+
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/dt/dt-1.10.25/datatables.min.css"/>
+
+    <script type="text/javascript" src="https://cdn.datatables.net/v/dt/dt-1.10.25/datatables.min.js"></script>
 
     <style type="text/css">
         img{
-            width: 100px;
-            height: 100px;
+            width: 50px;
+            height: 50px;
             padding: 0px;
             margin-top: 2px;
         }
@@ -29,24 +38,34 @@
         .table th, .table td{
             vertical-align: middle;
             margin: 0 auto;
+            text-align: center;
         }
-        .badge-light{
-            margin-right: 5px;
-        }
-        .badge-danger{
-            margin-right: 5px;
-        }
-        .badge{
-            font-size: 20px;
-            margin-top: 5px;
-            margin-bottom: 10px;
-            float: right;
-        }
-        .btn-group, .btn-group-vertical {
+        .btn-group {
             display: inline;
             vertical-align: middle;
             margin: 100px auto;
             padding: 0px;
+        }
+        .btn-group-vertical>.btn, .btn-group>.btn{
+            margin: 8px;
+            text-align: center;
+            float: none;
+            vertical-align: middle;
+        }
+        span{
+            float:left;
+            padding-left: 5px;
+        }
+        .dd {
+            font-size: 10px;
+            width: 730px;
+            course: hand;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis; /* IE */
+        }
+        .btn{
+            padding:5px;
         }
     </style>
 </head>
@@ -76,105 +95,103 @@
     </div>
 </div>
 
-    <button type="button" id="informationBtnOfAllDelete" class="badge badge-pill badge-danger">删除</button>
+<div class="btn-group operation">
     <a href="addInformation.html">
-         <button type="button" id="informationBtnOfAdd" class="badge badge-pill badge-light" >新增</button>
+        <button id="btn_add" type="button" class="btn bg-primary" style="margin-left: 10px;">
+            <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>新增
+        </button>
     </a>
+    <button id="btn_delete" type="button" class="btn btn-danger" style=" margin-left: 0px">
+        <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>删除
+    </button>
 </div>
+<!--<hr>-->
 
 <div>
     <table class="table table-striped table-bordered row-border hover order-column" cellspacing="0" width="100%" id="information_table">
-        <thead>
-        <tr>
-            <th scope="col"><input type="checkbox" id="check_all"/></th>
-            <th scope="col">资讯编号</th>
-            <th scope="col">资讯内容</th>
-            <th scope="col">资讯图片</th>
-            <th scope="col">资讯创建时间</th>
-            <th scope="col">操作</th>
-        </tr>
-        </thead>
-        <tbody>
 
-        </tbody>
     </table>
 </div>
 
 </body>
 
-<script>
+<script type="text/javascript">
 
-    $(function () {
-        findAllInformation();
+    $(document).ready(function() {
+        $('#information_table').DataTable({
+            "destroy":true,  //不加会报错
+            ajax:{
+                url:"findAllInformation.action",
+                dataSrc:'result'
+            },
+            columns:[
+                {
+                    "data":null,
+                    "title": "<input type='checkbox' id='check_all'/>",
+                    render: function (data, type, row) {
+                        var html = "<input type='checkbox'/>";
+                        return html;
+                    }
+                },
+                {"data": "InformationID", "title":"编号"},
+                {
+                    "data":null,
+                    "title":"咨询内容",
+                    render:function (data, type, row) {
+                        var content = data.InformationContent;
+                        var imgURL = content.split('<x>')[3].split('<p>')[1];
+                        var html = "<div>" + "<img src='"+ $(imgURL)[0].src +"' style='float:left;'/>";
+
+                        var title = content.split('<x>')[1].replace(/<[^>]+>/,"");
+                        html += "<span >" + title + "</span>";
+
+                        var brife = content.split('<x>')[2].replaces(/<[^>]+>/,"");
+                        html += "<br><span class='dd'>" + brife + "</span>";
+
+                        html += "</div>"
+                        return html;
+                    }
+                },
+                {"data":"InformationImage", "title":"咨询图片"},
+                {"data":"InformationCreateTime", "title":"咨询创建时间"},
+                {
+                    "data": null,
+                    "title": "操作",
+                    render: function (data, type, row) {
+                        var html = "<div style='margin-top:5px;' ><button type='button' onclick= 'editInformation("+ data.InformationID +")' id='InformationID" + data.InformationID + "' class='btn bg-info'><span class='glyphicon glyphicon-pencil' aria-hidden='true'>编辑</span></button></div>";
+                        html += "<div style='margin-top:5px;' ><button type='button' onclick='deleteInformation("+ data.InformationID +")' id='InformationID" + data.InformationID + "' class='btn btn-danger'><span class='glyphicon glyphicon-remove' aria-hidden='true'>删除</span></button></div>";
+                        var title = " <section class='content'>" + "<div class='btn-group operation'>";
+                        title += html;
+                        title += "</div>"
+                        return title;
+                    }
+                }
+            ]
+        });
     });
 
-    function findAllInformation() {
-        $.ajax({
-            url:"${APP_PATH}/findAllInformation",
-            type:"GET",
-            success:function (result) {
-                //  console.log(result);
-                var jsjson = eval("("+result+")");
-                console.log(jsjson);
-                build_information_table(jsjson);
-            }
-        });
+    function editInformation(informationId) {
+        $(location).attr("href","updateInformation.html?id=" + informationId);
     }
-    function build_information_table(jsjson) {
-        $("#information_table tbody").empty();
-        var information = jsjson.result;
-        console.log(information);
-        $.each(information, function (index, item) {
-            var checkBox = $("<td><input type='checkbox'/></td>");
-            checkBox.attr("id", "checkBox" + item.InformationID);
 
-            var informationID = $("<td></td>").append(item.InformationID);
-            informationID.attr("id", "informationID" + item.InformationID);
-
-            var informationContent = $("<td></td>").append(item.InformationContent);
-            informationContent.attr("id", "informationContent" + item.InformationID);
-
-            var informationImage = $("<td></td>").append(item.InformationImage);
-            informationImage.attr("id", "informationImage" + item.InformationID);
-
-            var informationCreateTime = $("<td></td>").append(item.InformationCreateTime);
-            informationCreateTime.attr("id", "informationCreateTime" + item.InformationID);
-
-            var edit = $("<button></button>").addClass("btn btn-secondary").append("编辑");
-            edit.attr("id", "edit" + item.InformationID);
-            var del = $("<button></button>").addClass("btn btn-secondary").append("删除");
-            del.attr("id", "del" + item.InformationID);
-            var btnGroup = $("<td></td>").addClass("btn-group").append(edit).append(" ").append(del);
-            $("<tr></tr>").append(checkBox).append(informationID).append(informationContent).append(informationImage).append(informationCreateTime).append(btnGroup).appendTo("#information_table tbody");
-        });
-    }
-    $(document).on("click", 'button[id^=del]', function () {
-        var id = $(this).attr("id").substring(3);
-        console.log(id)
+    function deleteInformation(informationId){
         $("#delList").modal();
-        $.ajax({
-            url:"${APP_PATH}/findInformationById?informationId=" + id,
-            method:"GET",
-            success:function (result) {
-                var json = eval("("+result+")").result;
-                var inp = $("#delList").find('input');
-                //输入框传值
-                $(inp[0]).val(json[0].InformationID);
-            }
-        });
+        //输入框传值
+        $("#delID").val(informationId);
+    }
+    $("#information_table").on("click","#check_all",function(){//给tr或者td添加click事件
+        console.log("111");
+        var check = $(this).prop("checked");
+        $("input[type='checkbox']").prop("checked", check);
     })
+
     $("#informationBtnOfDel").click(function () {
         var id = $("#delID").val();
         $.ajax({
-            url:"${APP_PATH}/deleteInformation?informationId=" + id,
+            url:"deleteInformation.action?informationId=" + id,
             method:"GET"
         });
-        $("#del" + id).parent().parent().remove();
-    })
-    $(document).on("click", 'button[id^=edit]', function () {
-        var id = $(this).attr("id").substring(4);
-        console.log(id);
-        $(location).attr("href","updateInformation.html?id=" + id);
+        $("#InformationID" + id).parent().parent().parent().parent().remove();
     })
 
 </script>

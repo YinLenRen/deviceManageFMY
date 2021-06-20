@@ -29,7 +29,6 @@
         <action name="findInformationById" class="myInformationActionApp" method="findInformationById"/>
         <action name="showInformationByIdFromWebPortol" class="myInformationActionApp" method="showInformationByIdFromWebPortol"/>
         <action name="showInformationByIdFromAppPortol" class="myInformationActionApp" method="showInformationByIdFromAppPortol"/>
-        <action name="addInformationFromJquery" class="myInformationActionApp" method="myInformationActionApp"/>
         <action name="deleteInformation" class="myInformationActionApp" method="deleteInformation"/>
         <!--InformationWEB端口-->
         <action name="addInformation" class="myInformationActionWeb" method="addInformation">

@@ -3,7 +3,7 @@
 
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <title>购物订单列表</title>
+    <title>购物列表</title>
         <%pageContext.setAttribute("APP_PATH", request.getContextPath());%>
     <script src="${APP_PATH}/jslib/js/jquery-1.12.4.min.js"></script>
     <!--  <script src="./jslib/js/mui.min.js"></script>
@@ -105,9 +105,9 @@
         <tr>
             <th scope="col"><input type="checkbox" id="check_all"/></th>
             <th scope="col">订单编号</th>
-            <th scope="col">订单项编号</th>
             <th scope="col">设备名称</th>
             <th scope="col">购买数量</th>
+            <th scope="col">用户ID</th>
             <th scope="col">操作</th>
         </tr>
         </thead>
@@ -124,7 +124,7 @@
     });
     function findAllShoppingorderitem() {
         $.ajax({
-            url:"${APP_PATH}/findAllShopingorderitem",
+            url:"${APP_PATH}/findAllShopingcart",
             method:"GET",
             success:function (result) {
                 var jsjson = eval("(" + result + ")");
@@ -136,26 +136,29 @@
     function bulid_shoppingorderitem_table(jsjson) {
         $("#shoppingorderitem_table tbody").empty();
         var shoppingorderitem = jsjson.result;
+        console.log(shoppingorderitem);
         $.each(shoppingorderitem, function (index, item) {
             var checkbox = $("<td><input type='checkbox'></td>");
-            checkbox.attr("id", "checkbox" + item.ShopingOrderItemId);
-            var shoppingorderitemId = $("<td></td>").append(item.ShopingOrderItemId);
-            shoppingorderitemId.attr("id", "ShopingOrderItemId" + item.ShopingOrderItemId);
-            var shopingOrderId = $("<td></td>").append(item.ShopingOrderId);
-            shopingOrderId.attr("id", "ShopingOrderId" + item.ShopingOrderItemId);
+            checkbox.attr("id", "checkbox" + item.ShopingcartID);
+            var shoppingorderitemId = $("<td></td>").append(item.ShopingcartID);
+            shoppingorderitemId.attr("id", "DeviceId" + item.ShopingcartID);
+
             var deviceName = $("<td></td>").append(item.Device.DeviceName);
-            deviceName.attr("id", "deviceName" + item.ShopingOrderItemId);
+            deviceName.attr("id", "deviceName" + item.ShopingcartID);
 
             var buyNum = $("<td></td>").append(item.BuyNum);
-            buyNum.attr("id", "buyNum" + item.ShopingOrderItemId);
+            buyNum.attr("id", "userId" + item.ShopingcartID);
+
+            var userId = $("<td></td>").append(item.UserId);
+            userId.attr("id", "userId" + item.ShopingcartID);
 
             var edit = $("<button></button>").addClass("btn btn-secondary").append("编辑");
             //动态生成id
             edit.attr("id", "edit" + item.ShopingOrderItemId);
             var del = $("<button></button>").addClass("btn btn-secondary").append("删除");
-            del.attr("id", "del" + item.ShopingOrderItemId);
+            del.attr("id", "del" + item.ShopingcartID);
             var btnGroup = $("<td></td>").addClass("btn-group").append(edit).append().append(del);
-            $("<tr></tr>").append(checkbox).append(shoppingorderitemId).append(shopingOrderId).append(deviceName).append(buyNum).append(btnGroup).appendTo("#shoppingorderitem_table tbody");
+            $("<tr></tr>").append(checkbox).append(shoppingorderitemId).append(deviceName).append(buyNum).append(userId).append(btnGroup).appendTo("#shoppingorderitem_table tbody");
 
         });
     }

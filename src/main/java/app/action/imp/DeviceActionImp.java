@@ -42,7 +42,7 @@ public class DeviceActionImp extends ActionSupport implements DeviceAction, Serv
 
     @Override
     public void findDeviceByDeviceClassId() throws IOException {
-        String deviceClassId = request.getParameter("deviceClassId");
+        String deviceClassId = request.getParameter("deviceClassID");
         List<Device> list = deviceDao.findDeviceByDeviceClassId(new Integer(deviceClassId));
         makeJson(list);
     }
@@ -76,7 +76,7 @@ public class DeviceActionImp extends ActionSupport implements DeviceAction, Serv
 
     @Override
     public void updateDeviceById() throws IOException {
-        String deviceId = request.getParameter("deviceId");
+        String deviceId = request.getParameter("deviceID");
         String deviceName = request.getParameter("deviceName");
         String devicePrice = request.getParameter("devicePrice");
         deviceDao.updateDeviceById(new Integer(deviceId), deviceName, devicePrice);
@@ -130,8 +130,15 @@ public class DeviceActionImp extends ActionSupport implements DeviceAction, Serv
         JSONArray jsonArray = new JSONArray();
         for(Device d : list){
             JSONObject jsonObject = new JSONObject();
-            jsonObject.put("DeviceId", d.getDeviceId());
-            jsonObject.put("DeviceClassId", d.getDeviceclass().getDeviceClassId());
+            jsonObject.put("DeviceID", d.getDeviceId());
+
+            Deviceclass deviceclass = deviceClassDao.findDeviceClass(d.getDeviceclass().getDeviceClassId());
+            JSONObject jsonObject1 = new JSONObject();
+            jsonObject1.put("DeviceClassID", deviceclass.getDeviceClassId());
+            jsonObject1.put("DeviceClassName", deviceclass.getDeviceClassName());
+            jsonObject.put("DeviceClass", jsonObject1);
+
+            jsonObject.put("DeviceClassID", d.getDeviceclass().getDeviceClassId());
             jsonObject.put("DeviceName", d.getDeviceName());
             jsonObject.put("DevicePrice", d.getDevicePrice());
             jsonArray.add(jsonObject);

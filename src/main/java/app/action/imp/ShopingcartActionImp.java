@@ -29,7 +29,10 @@ public class ShopingcartActionImp extends ActionSupport implements ShopingcartAc
     HttpServletRequest request;
     HttpServletResponse response;
     private ShopingcartDao shopingcartDao;
-   private DeviceDao deviceDao;
+       private DeviceDao deviceDao;
+       private UserDao userDao;
+
+
 
     public void setShopingcartDao(ShopingcartDao shopingcartDao) {
         this.shopingcartDao = shopingcartDao;
@@ -56,6 +59,7 @@ public class ShopingcartActionImp extends ActionSupport implements ShopingcartAc
     }
 
 
+
     void makeJson(List<Shopingcart> list) throws IOException {
         response.setHeader("Content-Type", "text/html;charset=utf-8");
         PrintWriter out = response.getWriter();
@@ -64,14 +68,21 @@ public class ShopingcartActionImp extends ActionSupport implements ShopingcartAc
             JSONObject jsonObject = new JSONObject();
             jsonObject.put("ShopingcartID", c.getShopingcartId());
             Device dev = deviceDao.findDeviceById(new Integer(c.getDevice().getDeviceId()));
+
             JSONObject jsonDev = new JSONObject();
-            jsonDev.put("DevcieId", dev.getDeviceId());
-            jsonDev.put("DeviceClassId", dev.getDeviceclass().getDeviceClassId());
+            jsonDev.put("DevcieID", dev.getDeviceId());
+            jsonDev.put("DeviceClassID", dev.getDeviceclass().getDeviceClassId());
             jsonDev.put("DeviceName", dev.getDeviceName());
             jsonDev.put("DevicePrice", dev.getDevicePrice());
             jsonObject.put("Device", jsonDev);
             jsonObject.put("BuyNum", c.getBuyNum());
-            jsonObject.put("UserId", c.getUser().getUserId());
+
+            JSONObject jsonUser = new JSONObject();
+            User user = userDao.findUserById(c.getUser().getUserId());
+            jsonUser.put("UserID", user.getUserId());
+            jsonUser.put("UserName", user.getUserName());
+            jsonObject.put("User", jsonUser);
+
             jsonArray.add(jsonObject);
         }
         System.out.println(jsonArray.toString());
@@ -97,8 +108,6 @@ public class ShopingcartActionImp extends ActionSupport implements ShopingcartAc
         List<Shopingcart> list = shopingcartDao.findShopingcartByUserId(new Integer(id));
         makeJson(list);
     }
-
-    UserDao userDao;
 
     public void setUserDao(UserDao userDao) {
         this.userDao = userDao;
@@ -132,10 +141,9 @@ public class ShopingcartActionImp extends ActionSupport implements ShopingcartAc
         String receive = request.getParameter("receive");
         String receiveAddress = request.getParameter("receiveAddress");
         String createtime = request.getParameter("createtime");
-        String moneyAmount = request.getParameter("moneyAmount");
+       // String moneyAmount = request.getParameter("moneyAmount");
         Shopingorder shopingorder = new Shopingorder();
         shopingorder.setCreatetime(createtime);
-        shopingorder.setMoneyAmount(moneyAmount);
         shopingorder.setReceiveAddress(receiveAddress);
         shopingorder.setReceiver(receive);
         User user = userDao.findUserById(new Integer(UserId));
@@ -144,11 +152,35 @@ public class ShopingcartActionImp extends ActionSupport implements ShopingcartAc
         List<Shopingcart> list = new ArrayList<Shopingcart>();
         String shopingids = request.getParameter("shopingcartids");
         String shopingcartIdList[] = shopingids.split(",");
+        int ans = 0;
         for(String id : shopingcartIdList){
             Shopingcart sc = shopingcartDao.findShopingcartById(new Integer(id));
+            Device device = deviceDao.findDeviceById(new Integer(sc.getDevice().getDeviceId()));
+            String devicePrice = device.getDevicePrice();
+            int buyNum = sc.getBuyNum();
+            ans += new Integer(devicePrice) * buyNum;
             list.add(sc);
         }
+        shopingorder.setMoneyAmount(Integer.toString(ans));
         shopingcartDao.calulation(shopingorder, list);
         return SUCCESS;
+    }
+
+    @Override
+    public void updateShoppingcart() {
+        String shoppingcartId = request.getParameter("shoppingcartId");
+        String deviceId = request.getParameter("deviceId");
+        String buyNum = request.getParameter("buyNum");
+        String userId = request.getParameter("userId");
+        Shopingcart shopingcart = shopingcartDao.findShopingcartById(new Integer(shoppingcartId));
+        shopingcart.setBuyNum(new Integer(buyNum));
+
+        User user = userDao.findUserById(new Integer(userId));
+        shopingcart.setUser(user);
+
+        Device device = deviceDao.findDeviceById(new Integer(deviceId));
+        shopingcart.setDevice(device);
+        shopingcartDao.updateShoppingcart(shopingcart);
+
     }
 }

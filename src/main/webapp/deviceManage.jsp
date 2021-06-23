@@ -6,23 +6,39 @@
     <title>设备列表</title>
     <%pageContext.setAttribute("APP_PATH", request.getContextPath());%>
     <script src="${APP_PATH}/jslib/js/jquery-1.12.4.min.js"></script>
-    <script src="https://cdn.bootcss.com/popper.js/1.14.7/umd/popper.min.js"></script>
-    <script src="jslib/bootstrap-4.6.0-dist/js/bootstrap.min.js"></script>
-    <link href="jslib/bootstrap-4.6.0-dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <link href="jslib/bootstrap-3.3.7-dist/css/bootstrap.css" rel="stylesheet">
+    <script src="jslib/bootstrap-3.3.7-dist/js/bootstrap.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/dt/dt-1.10.25/datatables.min.css"/>
+    <script type="text/javascript" src="https://cdn.datatables.net/v/dt/dt-1.10.25/datatables.min.js"></script>
+
     <style type="text/css">
         .table {
             text-align: center;
+            padding: 0px;
         }
-        .badge{
-            font-size: 20px;
-            margin-top: 5px;
-            margin-bottom: 10px;
-            float: right;
+        .table th, .table td{
+            vertical-align: middle;
+            margin: 0 auto;
+            text-align: center;
         }
-        .badge-light{
-            margin-right: 5px;
+        .btn-group {
+            display: inline;
+            vertical-align: middle;
+            margin: 100px auto;
+            padding: 0px;
         }
-        .badge-danger{
+        .btn-group-vertical>.btn, .btn-group>.btn{
+            margin: 8px;
+            text-align: center;
+            float: none;
+            vertical-align: middle;
+        }
+        .btn{
+            padding:5px;
+            font-size: 10px;
+            margin-bottom: 5px;
             margin-right: 5px;
         }
     </style>
@@ -46,8 +62,10 @@
                     <input type="text" class="form-control" id="editDeviceId" readonly>
                 </div>
                     <div class="form-group">
-                        <label class="col-form-label">设备分类编号</label>
-                        <input type="text" class="form-control" id="editDeviceClassId">
+                        <label class="col-form-label">设备分类名称</label>
+                        <select class="form-control" id="editDeviceClassSelect" >
+                            <option value="" ></option>
+                        </select>
                     </div>
                     <div class="form-group">
                         <label class="col-form-label">设备名称</label>
@@ -105,9 +123,9 @@
                         <input type="text" class="form-control" id="addDeviceId" readonly>
                     </div>
                     <div class="form-group">
-                        <label class="col-form-label">设备分类</label>
-                        <select class="form-control" id="deviceClassSelect" >
-                            <option value="" ></option>
+                        <label class="col-form-label">设备分类名称</label>
+                        <select class="form-control" id="addDeviceClassSelect" >
+                            <option value=""></option>
                         </select>
                     </div>
                     <!--<div class="dropdown">
@@ -139,25 +157,16 @@
 </div>
 
 <div>
-    <button type="button" id="deviceBtnOfAllDelete" class="badge badge-pill badge-danger">删除</button>
-    <button type="button" id="deviceBtnOfAdd" class="badge badge-pill badge-light" >新增</button>
+    <button id="btn_delete" type="button" class="btn btn-danger" style=" margin-left: 0px; float: right; margin-top:5px;">
+        <span class="glyphicon glyphicon-trash" aria-hidden="true" ></span>删除
+    </button>
+    <button id="btn_add" type="button" class="btn bg-primary" style="margin-left: 10px; float: right; margin-top:5px;">
+        <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>新增
+    </button>
 </div>
 
     <div>
         <table class="table table-striped table-bordered row-border hover order-column" cellspacing="0" width="100%" id="device_table">
-            <thead>
-            <tr>
-                <th scope="col"><input type="checkbox" id="check_all"></th>
-                <th scope="col">设备编号</th>
-                <th scope="col">设备分类编号</th>
-                <th scope="col">设备名称</th>
-                <th scope="col">设备价格</th>
-                <th scope="col">操作</th>
-            </tr>
-            </thead>
-            <tbody>
-
-            </tbody>
         </table>
     </div>
 </select>
@@ -166,92 +175,89 @@
 
 <script>
 
-    $(function () {
-        findAllDevice();
-    });
-    function findAllDevice() {
-        $.ajax({
-            url:"${APP_PATH}/findAllDevice",
-            method:"GET",
-            success:function (result) {
-                var jsjson = eval("("+result+")");
-                console.log(jsjson);
-                build_device_table(jsjson);
-                bulid_deviceclass_selected(jsjson);
-            }
-        });
-    }
-    function findAllDeviceClass() {
-        $.ajax({
-            url:"${APP_PATH}/findAllDeviceClass",
-            type:"GET",
-            success:function (result) {
-                //  console.log(result);
-                var jsjson = eval("("+result+")");
-                //console.log(jsjson);
-                bulid_deviceclass_selected(jsjson);
-            }
-        });
-    }
-    function build_device_table(jsjson) {
-        $("#device_table tbody").empty();
-        var device = jsjson.result;
-        $.each(device, function (index, item) {
-            var checkBox = $("<td><input type='checkbox'></td>");
-            checkBox.attr("id", "checkBox" + item.DeviceId);
-            var deviceID = $("<td></td>").append(item.DeviceId);
-            deviceID.attr("id", "deviceId" + item.DeviceId);
-            var deviceclassID = $("<td></td>").append(item.DeviceClassId);
-            deviceclassID.attr("id", "deviceClassId" + item.DeviceId);
-            var deviceName = $("<td></td>").append(item.DeviceName);
-            deviceName.attr("id", "deviceName" + item.DeviceId);
-            var devicePrice = $("<td></td>").append(item.DevicePrice);
-            devicePrice.attr("id", "devicePrice" + item.DeviceId);
-            var editBtn = $("<button></button>").addClass("btn btn-secondary").append("编辑");
-            editBtn.attr("id", "edit" + item.DeviceId);
-            var delBtn = $("<button></button>").addClass("btn btn-secondary").append("删除");
-            delBtn.attr("id", "del" + item.DeviceId);
-            var btnGroup = $("<td></td>").addClass("btn-group").append(editBtn).append(" ").append(delBtn);
-            $("<tr></tr>").append(checkBox).append(deviceID).append(deviceclassID).append(deviceName).append(devicePrice).append(btnGroup).appendTo("#device_table tbody");
+    $(document).ready(function () {
+        $('#device_table').DataTable({
+            "destroy": true,  //不加会报错
+            "language": {
+                "sProcessing": "处理中...",
+                "sLengthMenu": "显示 _MENU_ 项结果",
+                "sZeroRecords": "没有匹配结果",
+                "sInfo": "显示第 _START_ 至 _END_ 项结果，共 _TOTAL_ 项",
+                "sInfoEmpty": "显示第 0 至 0 项结果，共 0 项",
+                "sInfoFiltered": "(由 _MAX_ 项结果过滤)",
+                "sInfoPostFix": "",
+                "sSearch": "搜索:",
+                "sUrl": "",
+                "sEmptyTable": "表中数据为空",
+                "sLoadingRecords": "载入中...",
+                "sInfoThousands": ",",
+                "oPaginate": {
+                    "sFirst": "首页",
+                    "sPrevious": "上页",
+                    "sNext": "下页",
+                    "sLast": "末页"
+                },
+                "oAria": {
+                    "sSortAscending": ": 以升序排列此列",
+                    "sSortDescending": ": 以降序排列此列"
+                }
+            },
+            ajax: {
+                url: "findAllDevice.action",
+                dataSrc: 'result'
+            },
+            columns: [
+                {
+                    "data": null,
+                    "title": "<input type='checkbox' id='check_all'/>",
+                    render: function (data, type, row) {
+                        var html = "<input type='checkbox' id='checkbox" + data.DeviceID + "' />";
+                        return html;
+                    }
+                },
+                {"data": "DeviceID", "title": "设备编号"},
+                {"data":"DeviceClass.DeviceClassName", "title": "设备分类编号"},
+                {"data": "DeviceName", "title": "设备名称"},
+                {"data": "DevicePrice", "title": "设备价格"},
+                {
+                    "data": null,
+                    "title": "操作",
+                    render: function (data, type, row) {
+                        var html = "<div style='margin-top:5px;' ><button type='button' onclick= 'editDevice(" + data.DeviceID + ")' id='deviceId" + data.DeviceID + "' class='btn bg-info'><span class='glyphicon glyphicon-pencil' aria-hidden='true'>编辑</span></button></div>";
+                        html += "<div style='margin-top:5px;'><button type='button' onclick='deleteDevice(" + data.DeviceID + ")' id='deviceId" + data.DeviceID + "' class='btn btn-danger'><span class='glyphicon glyphicon-remove' aria-hidden='true'>删除</span></button></div>";
+                        var title = " <section class='content'>" + "<div class='btn-group operation'>";
+                        title += html;
+                        title += "</div>"
+                        return title;
+                    }
+                }
+            ]
+        })
+    })
 
-        });
-    }
-
-    $(document).on('click', 'button[id^=edit]', function () {
-        var a = $(this).attr("id").substring(4);
-        console.log(a);
+    function editDevice(deviceID) {
         $("#listOfEdit").modal();
         $.ajax({
-            url:"${APP_PATH}/findDeviceById?deviceId=" + a,
+            url:"findDeviceById.action?deviceId=" + deviceID,
             method:"GET",
             success:function (result) {
                 var json = eval("("+result+")").result;
                 var inp = $("#modalOfEditList").find('input');
-                console.log(inp);
+                //console.log(inp);
                 console.log(json);
-                $(inp[0]).val(json[0].DeviceId);
-                $(inp[1]).val(json[0].DeviceClassId);
-                $(inp[2]).val(json[0].DeviceName);
-                $(inp[3]).val(json[0].DevicePrice);
+                $(inp[0]).val(json[0].DeviceID);
+                findAllDevice("editDeviceClassSelect", json[0].DeviceClassID);
+                $(inp[1]).val(json[0].DeviceName);
+                $(inp[2]).val(json[0].DevicePrice);
             }
         });
-    })
-    $(document).on('click', 'button[id^=del]', function () {
-        var a = $(this).attr("id").substring(3);
+    }
+    function deleteDevice(deviceId) {
         $("#delList").modal();
-        $.ajax({
-            url:"${APP_PATH}/findDeviceById?deviceId=" + a,
-            method:"GET",
-            success:function (result) {
-                var json = eval("("+result+")").result;
-                var inp = $("#delList").find('input');
-                //输入框传值
-                $(inp[0]).val(json[0].DeviceId);
-                $(inp[1]).val(json[1].DeviceClassId);
-            }
-        });
-    });
-    $("#deviceBtnOfAdd").click( function () {
+        var inp = $("#delList").find('input');
+        $(inp[0]).val(deviceId);
+    }
+    $("#btn_add").click(function () {
         $("#addList").modal();
         $.ajax({
             url:"${APP_PATH}/findAllDevice",
@@ -259,66 +265,76 @@
             success:function (result) {
                 var len = eval("("+result+")").result;
                 $("#addDeviceId").val(len.length + 1);
-                findAllDeviceClass();
+                findAllDeviceClass("addDeviceClassSelect");
                 $("#addDevicePrice").empty();
                 $("#addDeviceName").empty();
             }
         });
-    });
-    $("button[id=deviceBtnOfEdit]").click( function (){
+    })
+    function findAllDeviceClass(str, id) {
+        $.ajax({
+            url:"findAllDeviceClass.action",
+            type:"GET",
+            success:function (result) {
+                //  console.log(result);
+                var jsjson = eval("("+result+")");
+                //console.log(jsjson);
+                bulid_deviceclass_selected(jsjson, str, id);
+            }
+        });
+    }
+    $("#deviceBtnOfEdit").click( function (){
         var editDeviceId = $("#editDeviceId").val();
-        var editDeviceClassId = $("#editDeviceClassId").val();
+        var editDeviceClassId = $("#editDeviceClassSelect option:selected").val();
         var editDeviceName = $("#editDeviceName").val();
         var editDevicePrice = $("#editDevicePrice").val();
         var nowData = [].concat(editDevicePrice, editDeviceName, editDeviceClassId, editDeviceId);
         console.log(nowData);
         $.ajax({
-            url:"${APP_PATH}/editDevice?deviceId=" + editDeviceId + "&deviceClassId="+ editDeviceClassId + "&deviceName=" + editDeviceName + "&devicePrice=" + editDevicePrice,
+            url:"editDevice.action?deviceId=" + editDeviceId + "&deviceClassId="+ editDeviceClassId + "&deviceName=" + editDeviceName + "&devicePrice=" + editDevicePrice,
             methods:"GET",
             success:function () {
-                //查找id为"#edit" + editDeviceClassId所在td的所有td
-                var newData = Array.prototype.slice.call($("#edit" + editDeviceId).parent().prevAll());
-                console.log(newData);
-                for(var i = 0; i < nowData.length; ++i){
-                    newData[i].innerHTML = nowData[i];
-                }
+                window.location = "deviceManage.jsp";
             }
         });
     });
 
     $("#deviceBtnOfDel").click(function () {
         var id = $("#delID").val();
+        console.log(id);
         $.ajax({
-            url:"${APP_PATH}/deleteDevice?deviceId=" + id,
-            method:"GET"
+            url:"deleteDevice.action?deviceId=" + id,
+            method:"GET",
+            success:function () {
+                window.location = "deviceManage.jsp";
+            }
         });
-        $("#del" + id).parent().parent().remove();  //移除该列<tr></tr>
     });
 
     $("#saveDeviceBtn").click(function () {
         var addDeviceId = $("#addDeviceId").val();
-        var addDeviceClassId = $("#deviceClassSelect option:selected").val();
+        var addDeviceClassId = $("#addDeviceClassSelect option:selected").val();
         var addDevicePrice = $("#addDevicePrice").val();
         var addDeviceName = $("#addDeviceName").val();
         $.ajax({
-            url:"${APP_PATH}/addDevice?deviceId=" + addDeviceId + "&deviceClassId="+ addDeviceClassId + "&deviceName=" + addDeviceName + "&devicePrice=" + addDevicePrice,
+            url:"${APP_PATH}/addDevice.action?deviceId=" + addDeviceId + "&deviceClassId="+ addDeviceClassId + "&deviceName=" + addDeviceName + "&devicePrice=" + addDevicePrice,
             method:"GET",
             success:function () {
-                findAllDevice();
+                window.location = "deviceManage.jsp";
             }
         });
     })
-    $("#deviceBtnOfAllDelete").click(function () {
+    $("#btn_delete").click(function () {
         var checkIDs = new Array();
         checkIDs = getAllCheckIDs();
         console.log(checkIDs);
         for(var i = 0; i < checkIDs.length; ++i){
             $.ajax({
-                url:"${APP_PATH}/deleteDevice?deviceId=" + checkIDs[i],
+                url:"deleteDevice.action?deviceId=" + checkIDs[i],
                 method:"POST",
             });
             console.log("#del" + checkIDs[i]);
-            $("#del" + checkIDs[i]).parent().parent().remove();  //移除该列<tr></tr>
+            window.location = "deviceManage.jsp";
         }
     })
     function getAllCheckIDs(){
@@ -327,7 +343,7 @@
         for(var i = 0; i < trNum.length; i++){
             var tdArr = trNum.eq(i).find("td").eq(0);
             if(tdArr.find("input").is(":checked")){
-                checkBoxId.push(tdArr.attr("id").substring(8));
+                checkBoxId.push(tdArr.children("input").attr("id").substring(8));
                 //   console.log($("input[id^='checkBox']").attr("id"));
             }
 
@@ -335,31 +351,38 @@
         console.log(checkBoxId);
         return checkBoxId;
     }
-    /*全选、全不选
-     *prop设置属性或值
-     */
-    $("#check_all").click(function () {
-        $("input[type^='checkbox']").each(function () {
-            if ($(this).prop("checked") == true) {
-                $("input[type='checkbox']").prop('checked', true);
-                return;
-            } else {
-                $("input[type='checkbox']").prop('checked', false);
-                return;
-            }
-        })
+    $("#device_table").on("click","#check_all",function(){//给tr或者td添加click事件
+        var check = $(this).prop("checked");
+        $("input[type='checkbox']").prop("checked", check);
     })
 
-    function bulid_deviceclass_selected(jsjson) {
+    function bulid_deviceclass_selected(jsjson, str, id) {
         var deviceclass = jsjson.result;
         var content = '';
-        $.each(deviceclass,function(index,item){
-            content += "<option value='" + item.DeviceClassId + "'>"+ item.DeviceClassName +"</option>";
-        });
+        if(str == 'editDeviceClassSelect'){
+            var content1 = '';
+            $.each(deviceclass,function(index,item){
+                //console.log(item.DeviceClassName);
+                if(index != id - 1) {
+                    content1 += "<option value='" + item.DeviceClassID + "'>" + item.DeviceClassName + "</option>";
+                }
+                else{
+                    content += "<option value='" + item.DeviceClassID + "'>" + item.DeviceClassName + "</option>";
+                }
+            });
+            content += content1;
+        }
+        else {
+            $.each(deviceclass,function(index,item){
+                //console.log(item.DeviceClassName);
+                content += "<option value='" + item.DeviceClassID + "'>"+ item.DeviceClassName +"</option>";
+            });
+        }
             //选择列表，选中的值赋值;
-        /*$("#deviceClassSelect").html(content).trigger("chosen:updated").change(function () {
-            deviceClassSelect = $("#deviceClassSelect option:selected").val();
-        });*/
+        $("#" + str).html(content).trigger("chosen:updated").change(function () {
+            str = $("#" + str + "option:selected").val();
+            //console.log(str);
+        });
     }
 
 </script>

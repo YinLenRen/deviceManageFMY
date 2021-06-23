@@ -9,4 +9,5 @@ public interface ShopingcartAction {
     String  addShopingcart();
     String deleteShopingcart();
     String calulation();
+    void updateShoppingcart();
 }

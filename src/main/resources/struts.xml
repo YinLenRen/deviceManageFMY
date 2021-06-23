@@ -79,6 +79,7 @@
         <action name="calulation" class="myShopingcartAction" method="calulation">
             <result name="success">/calulationShopingcartSuccess.jsp</result>
         </action>
+        <action name="updateShoppingcart" class="myShopingcartAction" method="updateShoppingcart"/>
 
     </package>
 </struts>

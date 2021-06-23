@@ -6,6 +6,8 @@ import com.alibaba.fastjson.JSONObject;
 import com.opensymphony.xwork2.ActionSupport;
 import org.apache.struts2.interceptor.ServletRequestAware;
 import org.apache.struts2.interceptor.ServletResponseAware;
+import org.apache.struts2.json.annotations.JSON;
+import org.dao.DeviceDao;
 import org.dao.ShopingorderDao;
 import org.dao.UserDao;
 import org.model.Device;
@@ -25,6 +27,7 @@ public class ShopingorderActionImp extends ActionSupport implements Shopingorder
     HttpServletRequest request;
     ShopingorderDao shopingorderDao;
 
+
     public void setShopingorderDao(ShopingorderDao shopingorderDao) {
         this.shopingorderDao = shopingorderDao;
     }
@@ -42,12 +45,19 @@ public class ShopingorderActionImp extends ActionSupport implements Shopingorder
         JSONArray jsonArray = new JSONArray();
         for(Shopingorder s : list){
             JSONObject jsonObject = new JSONObject();
-            jsonObject.put("ShopingOrderId", s.getShopingOrderId());
-            jsonObject.put("UserId", s.getUser().getUserId());
+            jsonObject.put("ShopingOrderID", s.getShopingOrderId());
+
+            JSONObject jsonObject1 = new JSONObject();
+            User user = userDao.findUserById(new Integer(s.getUser().getUserId()));
+            jsonObject1.put("UserID", user.getUserId());
+            jsonObject1.put("UserName", user.getUserName());
+
+            jsonObject.put("UserID", s.getUser().getUserId());
             jsonObject.put("Receiver",s.getReceiver());
             jsonObject.put("ReceiverAddress", s.getReceiveAddress());
             jsonObject.put("Createtime", s.getCreatetime());
             jsonObject.put("MoneyAmount", s.getMoneyAmount());
+            jsonObject.put("User", jsonObject1);
             jsonArray.add(jsonObject);
         }
         System.out.println(jsonArray.toString());

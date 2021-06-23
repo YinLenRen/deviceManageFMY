@@ -39,7 +39,7 @@ public class UserActionImp extends ActionSupport implements UserAction, ServletR
         JSONArray jsonArray = new JSONArray();
         for(User u : list){
             JSONObject jsonObject = new JSONObject();
-            jsonObject.put("UserId", u.getUserId());
+            jsonObject.put("UserID", u.getUserId());
             jsonObject.put("UserName", u.getUserName());
             jsonObject.put("UserPassword", u.getUserPassword());
             jsonArray.add(jsonObject);

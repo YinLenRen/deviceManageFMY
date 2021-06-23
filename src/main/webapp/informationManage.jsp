@@ -23,6 +23,7 @@
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/dt/dt-1.10.25/datatables.min.css"/>
 
     <script type="text/javascript" src="https://cdn.datatables.net/v/dt/dt-1.10.25/datatables.min.js"></script>
+    <script type="text/javascript" src="jslib/js/common.js"></script>
 
     <style type="text/css">
         img{
@@ -57,6 +58,7 @@
             padding-left: 0px;
         }
         .dd {
+            float: left;
             padding-left: 10px;
             font-size: 10px;
             width: 730px;
@@ -64,6 +66,11 @@
             overflow: hidden;
             white-space: nowrap;
             text-overflow: ellipsis; /* IE */
+            -o-text-overflow: ellipsis; /* for Opera */
+            -icab-text-overflow: ellipsis; /* for iCab */
+            -khtml-text-overflow: ellipsis; /* for Konqueror Safari */
+            -moz-text-overflow: ellipsis; /* for Firefox,mozilla */
+            -webkit-text-overflow: ellipsis; /* for Safari,Swift*/
         }
         .btn{
             padding:5px;
@@ -104,7 +111,7 @@
         </button>
     </a>
     <button id="btn_delete" type="button" class="btn btn-danger" style=" margin-left: 0px">
-        <span class="glyphicon glyphicon-trash" aria-hidden="true" onclick="deleteAllInformation"></span>删除
+        <span class="glyphicon glyphicon-trash" aria-hidden="true" ></span>删除
     </button>
 </div>
 <!--<hr>-->
@@ -121,6 +128,30 @@
     $(document).ready(function() {
         $('#information_table').DataTable({
             "destroy":true,  //不加会报错
+            "language": {
+                "sProcessing": "处理中...",
+                "sLengthMenu": "显示 _MENU_ 项结果",
+                "sZeroRecords": "没有匹配结果",
+                "sInfo": "显示第 _START_ 至 _END_ 项结果，共 _TOTAL_ 项",
+                "sInfoEmpty": "显示第 0 至 0 项结果，共 0 项",
+                "sInfoFiltered": "(由 _MAX_ 项结果过滤)",
+                "sInfoPostFix": "",
+                "sSearch": "搜索:",
+                "sUrl": "",
+                "sEmptyTable": "表中数据为空",
+                "sLoadingRecords": "载入中...",
+                "sInfoThousands": ",",
+                "oPaginate": {
+                    "sFirst": "首页",
+                    "sPrevious": "上页",
+                    "sNext": "下页",
+                    "sLast": "末页"
+                },
+                "oAria": {
+                    "sSortAscending": ": 以升序排列此列",
+                    "sSortDescending": ": 以降序排列此列"
+                }
+            },
             ajax:{
                 url:"findAllInformation.action",
                 dataSrc:'result'
@@ -130,7 +161,7 @@
                     "data":null,
                     "title": "<input type='checkbox' id='check_all'/>",
                     render: function (data, type, row) {
-                        var html = "<input type='checkbox'/>";
+                        var html = "<input type='checkbox' id='checkbox" + data.InformationID + "'/>";
                         return html;
                     }
                 },
@@ -143,11 +174,11 @@
                         var imgURL = content.split('<x>')[3].split('<p>')[1];
 
                         var html = "<div>" + "<img src='"+ $(imgURL)[0].src +"' style='float:left;'/>";
-                        var title = content.split('<x>')[1].replace(/<[^>]+>/,"");
-                        html += title;
-                        var brife = content.split('<x>')[2].replace(/<[^>]+>/,"");
-                        html += "<p class='dd'>" + brife + "</p>";
-                        html += "</div>";
+                        var title = content.split('<x>')[1].replace(/<\/?[^>]*>/g, '');;
+                        html += "<div>" + title;
+                        var brife = content.split('<x>')[2].replace(/<\/?[^>]*>/g, '');
+                        html += "<br><span class='dd'>" + brife + "</span>";
+                        html += "</div></div>";
                         return html;
                     }
                 },
@@ -157,9 +188,9 @@
                     "data": null,
                     "title": "操作",
                     render: function (data, type, row) {
-                        var html = "<div style='margin-top:5px;' ><button type='button' onclick= 'editInformation("+ data.InformationID +")' id='InformationID" + data.InformationID + "' class='btn bg-info'><span class='glyphicon glyphicon-pencil' aria-hidden='true'>编辑</span></button></div>";
-                        html += "<div style='margin-top:5px;' ><button type='button' onclick='lookInformation("+ data.InformationID +")' id='InformationID"+ data.InformationID +"' class='btn btn-info'><span class='glyphicon glyphicon-eye-open' aria-hidden='true'>详情</span></button></div>";
-                        html += "<div style='margin-top:5px;' ><button type='button' onclick='deleteInformation("+ data.InformationID +")' id='InformationID" + data.InformationID + "' class='btn btn-danger'><span class='glyphicon glyphicon-remove' aria-hidden='true'>删除</span></button></div>";
+                        var html = "<div style='margin-top:5px;'><button type='button' onclick= 'editInformation("+ data.InformationID +")' id='InformationID" + data.InformationID + "' class='btn bg-info'><span class='glyphicon glyphicon-pencil' aria-hidden='true'>编辑</span></button></div>";
+                        html += "<div style='margin-top:5px;'><button type='button' onclick='lookInformation("+ data.InformationID +")' id='InformationID"+ data.InformationID +"' class='btn btn-info'><span class='glyphicon glyphicon-eye-open' aria-hidden='true'>详情</span></button></div>";
+                        html += "<div style='margin-top:5px;'><button type='button' onclick='deleteInformation("+ data.InformationID +")' id='InformationID" + data.InformationID + "' class='btn btn-danger'><span class='glyphicon glyphicon-remove' aria-hidden='true'>删除</span></button></div>";
                         var title = " <section class='content'>" + "<div class='btn-group operation'>";
                         title += html;
                         title += "</div>"
@@ -177,7 +208,6 @@
         $("#delID").val(informationId);
     }
     $("#information_table").on("click","#check_all",function(){//给tr或者td添加click事件
-        console.log("111");
         var check = $(this).prop("checked");
         $("input[type='checkbox']").prop("checked", check);
     })
@@ -187,7 +217,7 @@
             url:"deleteInformation.action?informationId=" + id,
             method:"GET"
         });
-        $("#InformationID" + id).parent().parent().parent().parent().remove();
+        window.location = "informationManage.jsp";
     })
     function lookInformation(informationId) {
         $.ajax({
@@ -198,7 +228,8 @@
             }
         })
     }
-    function deleteAllInformation() {
+    $("#btn_delete").click(function () {
+
         var checkIDs = new Array();
         checkIDs = getAllCheckIDs();
         for(var i = 0; i < checkIDs.length; ++i){
@@ -206,17 +237,18 @@
                 url:"${APP_PATH}/deleteInformation.action?informationId=" + checkIDs[i],
                 method:"POST",
             });
-            console.log("#del" + checkIDs[i]);
-            $("#del" + checkIDs[i]).parent().parent().remove();  //移除该列<tr></tr>
+            window.location = "informationManage.jsp";
         }
-    }
+    })
+
     function getAllCheckIDs(){
         var  checkBoxId = new Array();
         var trNum = ($("#information_table tbody").children("tr"));
         for(var i = 0; i < trNum.length; i++){
             var tdArr = trNum.eq(i).find("td").eq(0);
             if(tdArr.find("input").is(":checked")){
-                checkBoxId.push(tdArr.attr("id").substring(8));
+                console.log(tdArr.children("input").attr("id"));
+                checkBoxId.push(tdArr.children("input").attr("id").substring(8));
                 //   console.log($("input[id^='checkBox']").attr("id"));
             }
 

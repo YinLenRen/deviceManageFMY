@@ -110,6 +110,7 @@
 
     $("#informationID").prop("value", $.getUrlParam('id'));
     $("#fileinp").change(function () {
+        //隐藏多余路径
         $("#text").html($("#fileinp").val().substring(12));
    });
 

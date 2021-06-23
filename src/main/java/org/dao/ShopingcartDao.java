@@ -12,5 +12,6 @@ public interface ShopingcartDao {
     void deleteShopingcart(Shopingcart shopingcart);
     List<Shopingcart> findShopingcartByUserId(int userId);
     void calulation(Shopingorder shopingorder, List<Shopingcart> list);
+    void updateShoppingcart(Shopingcart shopingcart);
 }
 

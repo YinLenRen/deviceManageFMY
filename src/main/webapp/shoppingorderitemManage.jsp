@@ -45,6 +45,7 @@
         }
     </style>
 </head>
+
 <body>
 
 <!--新增-->
@@ -61,22 +62,28 @@
                 <form>
                     <div class="form-group">
                         <label class="col-form-label">订单项编号</label>
-                        <input type="text" class="form-control" id="addUserId" readonly>
+                        <input type="text" class="form-control" id="addShoppingorderitemId" readonly>
                     </div>
                     <div class="form-group">
                         <label class="col-form-label">订单编号</label>
-                        <input type="text" class="form-control" id="addUserName" >
+                        <input type="text" class="form-control" id="addShoppingorderId" >
                     </div>
                     <div class="form-group">
                         <label class="col-form-label">设备名称</label>
-                        <input type="text" class="form-control" id="addUserPassword" >
+                        <select class="form-control" id="addDeviceSelect" >
+                            <option value=""></option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-form-label">购买数量</label>
+                        <input type="text" class="form-control" id="addBuyNum">
                     </div>
                 </form>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal" id="addCannelBtn">重置</button>
-            </div>                <button type="button" class="btn btn-primary" id="saveUserBtn" data-dismiss="modal">确定</button>
-
+                <button type="button" class="btn btn-primary" id="saveDeviceClassBtn" data-dismiss="modal">确定</button>
+            </div>
         </div>
     </div>
 </div>
@@ -98,7 +105,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
-                <button type="button" class="btn btn-danger" data-dismiss="modal" id="userBtnOfDel">确定</button>
+                <button type="button" class="btn btn-danger" data-dismiss="modal" id="shoppingorderitemBtnOfDel">确定</button>
             </div>
         </div>
     </div>
@@ -117,22 +124,26 @@
             <div class="modal-body" id="modalOfEditList">
                 <form>
                     <div class="form-group">
-                        <label class="col-form-label">订单项编号</label>
-                        <input type="text" class="form-control" id="editUserId" readonly>
+                        <label class="col-form-label">订单编号</label>
+                        <input type="text" class="form-control" id="editShoppingorderitemId" readonly>
                     </div>
                     <div class="form-group">
-                        <label class="col-form-label">订单编号</label>
-                        <input type="text" class="form-control" id="editUserName" >
+                        <label class="col-form-label">订单项编号</label>
+                        <input type="text" class="form-control" id="editShoppingorderId" readonly>
                     </div>
                     <div class="form-group">
                         <label class="col-form-label">设备名称</label>
-                        <input type="text" class="form-control" id="editUserPassword" >
+                        <input type="text" class="form-control" id="editDeviceName">
+                    </div>
+                    <div class="form-group">
+                        <label class="col-form-label">购买数量</label>
+                        <input type="text" class="form-control" id="editBuyNum"></input>
                     </div>
                 </form>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal" id="cannelBtn">重置</button>
-                <button type="button" class="btn btn-primary" id="userBtnOfEdit" data-dismiss="modal">确定</button>
+                <button type="button" class="btn btn-primary" id="shoppingorderitemBtnOfEdit" data-dismiss="modal">确定</button>
             </div>
         </div>
     </div>
@@ -148,7 +159,7 @@
 </div>
 
 <div>
-    <table class="table table-striped table-bordered row-border hover order-column" cellspacing="0" width="100%" id="user_table">
+    <table class="table table-striped table-bordered row-border hover order-column" cellspacing="0" width="100%" id="shoppingorderitem_table">
         </tbody>
     </table>
 </div>
@@ -157,7 +168,7 @@
 <script>
 
     $(document).ready(function () {
-        $('#user_table').DataTable({
+        $('#shoppingorderitem_table').DataTable({
             "destroy": true,  //不加会报错
             "language": {
                 "sProcessing": "处理中...",
@@ -184,7 +195,7 @@
                 }
             },
             ajax: {
-                url: "findAllUser.action",
+                url: "findAllShopingorderitem.action",
                 dataSrc: 'result'
             },
             columns: [
@@ -192,19 +203,20 @@
                     "data": null,
                     "title": "<input type='checkbox' id='check_all'/>",
                     render: function (data, type, row) {
-                        var html = "<input type='checkbox' id='checkbox" + data.UserID + "' />";
+                        var html = "<input type='checkbox' id='checkbox" + data.ShopingOrderItemId + "' />";
                         return html;
                     }
                 },
-                {"data":"UserID", "title": "用户编号"},
-                {"data": "UserName", "title": "用户名"},
-                {"data":"UserPassword", "title": "用户密码"},
+                {"data":"ShopingOrderItemID", "title": "订单项编号"},
+                {"data": "ShopingOrderID", "title": "订单编号"},
+                {"data":"Device.DeviceName", "title": "设备名称"},
+                {"data": "BuyNum", "title": "购买数量"},
                 {
                     "data": null,
                     "title": "操作",
                     render: function (data, type, row) {
-                        var html = "<button type='button' onclick= 'editUser(" + data.UserID + ")' id='UserID" + data.UserID + "' class='btn bg-info'><span class='glyphicon glyphicon-pencil' aria-hidden='true'>编辑</span></button>";
-                        html += "<button type='button' onclick='deleteUser(" + data.UserID + ")' id='UserID" + data.UserID + "' class='btn btn-danger'><span class='glyphicon glyphicon-remove' aria-hidden='true'>删除</span></button>";
+                        var html = "<button type='button' onclick= 'editShopingOrderItem(" + data.ShopingOrderItemId + ")' id='ShopingOrderItemId" + data.ShopingOrderItemId + "' class='btn bg-info'><span class='glyphicon glyphicon-pencil' aria-hidden='true'>编辑</span></button>";
+                        html += "<button type='button' onclick='deleteShopingOrderItem(" + data.ShopingOrderItemId + ")' id='ShopingOrderItemId" + data.ShopingOrderItemId + "' class='btn btn-danger'><span class='glyphicon glyphicon-remove' aria-hidden='true'>删除</span></button>";
                         var title = " <section class='content'>" + "<div class='btn-group operation'>";
                         title += html;
                         title += "</div>"
@@ -217,30 +229,6 @@
     function editShopingOrderItem(ShopingOrderItemId) {
     }
     $("#btn_add").click(function () {
-        $("#addList").modal();
-        $.ajax({
-            url:"findAllUser.action",
-            method:"GET",
-            success:function (result) {
-                var deviceclass = eval("(" + result + ")").result;
-                $.each(deviceclass, function (index, item) {
-                    if(index == deviceclass.length - 1){
-                        $("#addUserId").val(item.UserID + 1);
-                    }
-                })
-            }
-        });
-    })
-    $("#saveDeviceClassBtn").click(function () {
-        var addUserId = $("#addUserId").val();
-        var addUserName = $("#addUserName").val();
-        $.ajax({
-            url:"addDeviceClass.action?deviceClassId=" + addDeviceClassId + "&deviceClassName=" + addDeviceClassName,
-            method:"GET",
-            success:function () {
-                window.location = "deviceClassManage.jsp";
-            }
-        });
     })
     $("#btn_delete").click(function () {
 
@@ -261,4 +249,34 @@
     $("#shoppingorderitem_table").on("click", "#check_all", function () {
         $("input[type='checkbox']").prop("checked", $(this).prop("checked"));
     })
+
+
+    /*function findAllShoppingorderitem() {
+        $.ajax({
+            url:"${APP_PATH}/findAllShopingorderitem",
+            method:"GET",
+            success:function (result) {
+                var jsjson = eval("(" + result + ")");
+                console.log(jsjson);
+                bulid_shoppingorderitem_table(jsjson);
+            }
+        });
+    }
+
+    $(document).on('click', 'button[id^=del]', function () {
+        $("#delList").modal();
+        var id = $(this).attr("id").substring(3);
+        var inp = $("#delList").find("input");
+        $(inp[0]).val(id);
+    })
+    $("#shoppingorderitemBtnOfDel").click(function () {
+        var id = $("#delID").val();
+        $.ajax({
+            url:"${APP_PATH}/deleteShopingorderitem?deleteShopingorderitemId=" + id,
+            method: "GET",
+        });
+        $("#del" + id).parent().parent().remove();
+    })*/
+
+
 </script>

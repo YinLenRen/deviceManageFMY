@@ -115,7 +115,7 @@ public class InformationActionImp extends ActionSupport implements InformationAc
 
     @Override
     public void showInformationByIdFromWebPortol() throws IOException {
-        String infoId = request.getParameter("infoId");
+        String infoId = request.getParameter("infoID");
         response.setHeader("Content-Type", "text/html;charset=utf-8");
         PrintWriter out = response.getWriter();
         Information information = informationDao.findInformationById(new Integer(infoId));

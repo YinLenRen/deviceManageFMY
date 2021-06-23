@@ -9,23 +9,38 @@
   <!--  <script src="./jslib/js/mui.min.js"></script>
     <link href="./jslib/css/mui.min.css" rel="stylesheet"/>
     <link rel="stylesheet" type="text/css" href="./jslib/css/app.css"/>   script不可用<script   /> -->
-    <script src="jslib/bootstrap-4.6.0-dist/js/bootstrap.js"></script>
-    <link href="jslib/bootstrap-4.6.0-dist/css/bootstrap.css" rel="stylesheet">
+    <link href="jslib/bootstrap-3.3.7-dist/css/bootstrap.css" rel="stylesheet">
+    <script src="jslib/bootstrap-3.3.7-dist/js/bootstrap.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/dt/dt-1.10.25/datatables.min.css"/>
+    <script type="text/javascript" src="https://cdn.datatables.net/v/dt/dt-1.10.25/datatables.min.js"></script>
 
     <style type="text/css">
         .table {
             text-align: center;
+            padding: 0px;
         }
-        .badge{
-            font-size: 20px;
-            margin-top: 5px;
-            margin-bottom: 10px;
-            float: right;
+        .table th, .table td{
+            vertical-align: middle;
+            margin: 0 auto;
+            text-align: center;
         }
-        .badge-light{
-            margin-right: 5px;
+        .btn-group {
+            display: inline;
+            vertical-align: middle;
+            margin: 100px auto;
+            padding: 0px;
         }
-        .badge-danger{
+        .btn-group-vertical>.btn, .btn-group>.btn{
+            margin: 8px;
+            text-align: center;
+            float: none;
+            vertical-align: middle;
+        }
+        .btn{
+            padding:5px;
+            font-size: 10px;
+            margin-bottom: 5px;
             margin-right: 5px;
         }
     </style>
@@ -114,123 +129,149 @@
     </div>
 </div>
 
-    <div>
+   <!-- <div>
         <button type="button" id="deviceClassBtnOfAllDelete" class="badge badge-pill badge-danger">删除</button>
         <button type="button" id="deviceClassBtnOfAdd" class="badge badge-pill badge-light" >新增</button>
-    </div>
+    </div>-->
+
+<div>
+    <button id="btn_delete" type="button" class="btn btn-danger" style=" margin-left: 0px; float: right; margin-top:5px;">
+        <span class="glyphicon glyphicon-trash" aria-hidden="true" ></span>删除
+    </button>
+    <button id="btn_add" type="button" class="btn bg-primary" style="margin-left: 10px; float: right; margin-top:5px;">
+        <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>新增
+    </button>
+</div>
 
     <div>
         <table class="table table-striped table-bordered row-border hover order-column" cellspacing="0" width="100%" id="deviceclass_table">
-            <thead>
-            <tr>
-                <th scope="col"><input type="checkbox" id="check_all"/></th>
-                <th scope="col">设备分类编号</th>
-                <th scope="col">设备分类名称</th>
-                <th scope="col">操作</th>
-            </tr>
-            </thead>
-            <tbody>
-
-            </tbody>
         </table>
     </div>
 </body>
 
-<script>
-    var aa = /^[0-9]*[1-9][0-9]*$/;
-    $(function () {
-        findAllDeviceClass();
-    });
+<script type="text/javascript">
 
-    function findAllDeviceClass() {
-        $.ajax({
-            url:"${APP_PATH}/findAllDeviceClass",
-            type:"GET",
-            success:function (result) {
-                //  console.log(result);
-                var jsjson = eval("("+result+")");
-                console.log(jsjson);
-                build_deviceclass_table(jsjson);
-            }
-        });
-    }
-    function build_deviceclass_table(jsjson) {
-        $("#deviceclass_table tbody").empty();
-        var deviceclass = jsjson.result;
-        console.log(deviceclass);
-        $.each(deviceclass, function (index, item) {
-            var checkBox = $("<td><input type='checkbox'/></td>");
-            checkBox.attr("id", "checkBox" + item.DeviceClassId);
-            //var checkBox = $("<td></td>").append(checkBox1);
-            var deviceClassID = $("<td></td>").append(item.DeviceClassId);
-            deviceClassID.attr("id", "deviceClassId" + item.DeviceClassId);
-            var deviceClassName = $("<td></td>").append(item.DeviceClassName);
-            var edit = $("<button></button>").addClass("btn btn-secondary").append("编辑");
-            deviceClassName.attr("id", "deviceClassName" + item.DeviceClassId);
-            //动态生成id
-            edit.attr("id", "edit" + item.DeviceClassId);
-            var del = $("<button></button>").addClass("btn btn-secondary").append("删除");
-            del.attr("id", "del" + item.DeviceClassId);
-            var btnGroup = $("<td></td>").addClass("btn-group").append(edit).append(" ").append(del);
-            $("<tr></tr>").append(checkBox).append(deviceClassID).append(deviceClassName).append(btnGroup).appendTo("#deviceclass_table tbody");
-        });
-    }
-        //正则匹配button的id以edit开头的
-    $(document).on('click', 'button[id^=edit]', function () {
-        var a = $(this).attr("id").substring(4);
-        console.log(a);
+    $(document).ready(function () {
+        $('#deviceclass_table').DataTable({
+            "destroy": true,  //不加会报错
+            "language": {
+                "sProcessing": "处理中...",
+                "sLengthMenu": "显示 _MENU_ 项结果",
+                "sZeroRecords": "没有匹配结果",
+                "sInfo": "显示第 _START_ 至 _END_ 项结果，共 _TOTAL_ 项",
+                "sInfoEmpty": "显示第 0 至 0 项结果，共 0 项",
+                "sInfoFiltered": "(由 _MAX_ 项结果过滤)",
+                "sInfoPostFix": "",
+                "sSearch": "搜索:",
+                "sUrl": "",
+                "sEmptyTable": "表中数据为空",
+                "sLoadingRecords": "载入中...",
+                "sInfoThousands": ",",
+                "oPaginate": {
+                    "sFirst": "首页",
+                    "sPrevious": "上页",
+                    "sNext": "下页",
+                    "sLast": "末页"
+                },
+                "oAria": {
+                    "sSortAscending": ": 以升序排列此列",
+                    "sSortDescending": ": 以降序排列此列"
+                }
+            },
+            ajax: {
+                url: "findAllDeviceClass.action",
+                dataSrc: 'result'
+            },
+            columns: [
+                {
+                    "data": null,
+                    "title": "<input type='checkbox' id='check_all'/>",
+                    render: function (data, type, row) {
+                        var html = "<input type='checkbox' id='checkbox" + data.DeviceClassID + "' />";
+                        return html;
+                    }
+                },
+                {"data":"DeviceClassID", "title": "设备分类名称"},
+                {"data": "DeviceClassName", "title": "设备名称"},
+                {
+                    "data": null,
+                    "title": "操作",
+                    render: function (data, type, row) {
+                        var html = "<button type='button' onclick= 'editDeviceClass(" + data.DeviceClassID + ")' id='deviceClassID" + data.DeviceClassID + "' class='btn bg-info'><span class='glyphicon glyphicon-pencil' aria-hidden='true'>编辑</span></button>";
+                        html += "<button type='button' onclick='deleteDeviceClass(" + data.DeviceClassID + ")' id='deviceClassID" + data.DeviceClassID + "' class='btn btn-danger'><span class='glyphicon glyphicon-remove' aria-hidden='true'>删除</span></button>";
+                        var title = " <section class='content'>" + "<div class='btn-group operation'>";
+                        title += html;
+                        title += "</div>"
+                        return title;
+                    }
+                }
+            ]
+        })
+    })
+
+    function editDeviceClass(deviceClassID) {
         $("#listOfEdit").modal();
         $.ajax({
-            url:"${APP_PATH}/findDeviceClass?deviceClassId=" + a,
+            url:"findDeviceClass.action?deviceClassId=" + deviceClassID,
             method:"GET",
             success:function (result) {
                 var json = eval("("+result+")").result;
                 var inp = $("#modalOfEditList").find('input');
-                $(inp[0]).val(json[0].DeviceClassId);
+                $(inp[0]).val(json[0].DeviceClassID);
                 $(inp[1]).val(json[0].DeviceClassName);
-                console.log(json[0].DeviceClassId);
+                //console.log(json[0].DeviceClassId);
 
             }
         });
-
-    })
-    $(document).on('click', 'button[id^=del]', function () {
-        var a = $(this).attr("id").substring(3);
+    }
+    function deleteDeviceClass(deviceClassID) {
         $("#delList").modal();
         var inp = $("#delList").find('input');
         //输入框传值
-        $(inp[0]).val(a);
-    });
-    $("#deviceClassBtnOfAdd").click( function () {
+        $(inp[0]).val(deviceClassID);
+    }
+    $("#btn_add").click(function () {
         $("#addList").modal();
         $.ajax({
-            url:"${APP_PATH}/findAllDeviceClass",
+            url:"findAllDeviceClass.action",
             method:"GET",
             success:function (result) {
                 var deviceclass = eval("(" + result + ")").result;
                 $.each(deviceclass, function (index, item) {
                     if(index == deviceclass.length - 1){
-                        $("#addDeviceClassId").val(item.DeviceClassId + 1);
+                        $("#addDeviceClassId").val(item.DeviceClassID + 1);
                     }
                 })
             }
         });
-    });
-    $("button[id=deviceClassBtnOfEdit]").click( function (){
+    })
+    $("#btn_delete").click(function () {
+        var checkIDs = new Array();
+        checkIDs = getAllCheckIDs();
+        for(var i = 0; i < checkIDs.length; ++i){
+            $.ajax({
+                url:"deleteDeviceClass.action?deviceClassId=" + checkIDs[i],
+                method:"POST",
+            });
+        }
+        window.location = "deviceClassManage.jsp";
+    })
+    $("#deviceClassBtnOfEdit").click( function (){
         var editDeviceClassId = $("#editDeviceClassId").val();
-        console.log(editDeviceClassId);
+        //console.log(editDeviceClassId);
         var editDeviceClassName = $("#editDeviceClassName").val();
         var nowData = [].concat(editDeviceClassName, editDeviceClassId);
         $.ajax({
-            url:"${APP_PATH}/editDeviceClass?deviceClassId=" + editDeviceClassId + "&deviceClassName=" + editDeviceClassName,
+            url:"editDeviceClass.action?deviceClassId=" + editDeviceClassId + "&deviceClassName=" + editDeviceClassName,
             methods:"GET",
             success:function () {
+                window.location = "deviceClassManage.jsp";
                 //查找id为"#edit" + editDeviceClassId所在td的所有td
-                var newData = Array.prototype.slice.call($("#edit" + editDeviceClassId).parent().prevAll());
+                /*var newData = Array.prototype.slice.call($("#edit" + editDeviceClassId).parent().prevAll());
                 //console.log(newData);
                 for(var i = 0; i < nowData.length; ++i){
                     newData[i].innerHTML = nowData[i];
-                }
+                }*/
             }
         });
     });
@@ -239,35 +280,24 @@
         var id = $("#delID").val();
         console.log(id);
         $.ajax({
-            url:"${APP_PATH}/deleteDeviceClass?deviceClassId=" + id,
-            method:"GET"
+            url:"deleteDeviceClass.action?deviceClassId=" + id,
+            method:"GET",
+            success:function () {
+                window.location = "deviceClassManage.jsp";
+            }
         });
-        $("#del" + id).parent().parent().remove();  //移除该列<tr></tr>
     });
 
     $("#saveDeviceClassBtn").click(function () {
         var addDeviceClassId = $("#addDeviceClassId").val();
         var addDeviceClassName = $("#addDeviceClassName").val();
         $.ajax({
-            url:"${APP_PATH}/addDeviceClass?deviceClassId=" + addDeviceClassId + "&deviceClassName=" + addDeviceClassName,
+            url:"addDeviceClass.action?deviceClassId=" + addDeviceClassId + "&deviceClassName=" + addDeviceClassName,
             method:"GET",
             success:function () {
-                findAllDeviceClass();
+                window.location = "deviceClassManage.jsp";
             }
         });
-    })
-    $("#deviceClassBtnOfAllDelete").click(function () {
-        var checkIDs = new Array();
-        checkIDs = getAllCheckIDs();
-        for(var i = 0; i < checkIDs.length; ++i){
-            $.ajax({
-                url:"${APP_PATH}/deleteDeviceClass?deviceClassId=" + checkIDs[i],
-                method:"POST",
-            });
-            console.log("#del" + checkIDs[i]);
-            $("#del" + checkIDs[i]).parent().parent().remove();  //移除该列<tr></tr>
-        }
-
     })
     function getAllCheckIDs(){
         var  checkBoxId = new Array();
@@ -275,7 +305,7 @@
         for(var i = 0; i < trNum.length; i++){
             var tdArr = trNum.eq(i).find("td").eq(0);
             if(tdArr.find("input").is(":checked")){
-                checkBoxId.push(tdArr.attr("id").substring(8));
+                checkBoxId.push(tdArr.children("input").attr("id").substring(8));
              //   console.log($("input[id^='checkBox']").attr("id"));
             }
 
@@ -286,16 +316,9 @@
     /*全选、全不选
      *prop设置属性或值
      */
-    $("#check_all").click(function () {
-        $("input[type^='checkbox']").each(function () {
-            if ($(this).prop("checked") == true) {
-                $("input[type='checkbox']").prop('checked', true);
-                return;
-            } else {
-                $("input[type='checkbox']").prop('checked', false);
-                return;
-            }
-        })
+    $("#deviceclass_table").on("click","#check_all",function(){//给tr或者td添加click事件
+        var check = $(this).prop("checked");
+        $("input[type='checkbox']").prop("checked", check);
     })
 
 </script>

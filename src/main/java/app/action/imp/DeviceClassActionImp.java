@@ -87,7 +87,7 @@ public class DeviceClassActionImp extends ActionSupport implements DeviceClassAc
         //JSONArray是json数组， JSONObject是json
         for(Deviceclass dc : list){
             JSONObject jsonObject = new JSONObject();
-            jsonObject.put("DeviceClassId", dc.getDeviceClassId());
+            jsonObject.put("DeviceClassID", dc.getDeviceClassId());
             jsonObject.put("DeviceClassName", dc.getDeviceClassName());
             jsonArray.add(jsonObject);
         }

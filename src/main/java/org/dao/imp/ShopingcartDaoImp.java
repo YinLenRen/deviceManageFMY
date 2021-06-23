@@ -70,4 +70,9 @@ public class ShopingcartDaoImp extends HibernateDaoSupport implements Shopingcar
             deleteShopingcart(sc);
         }
     }
+
+    @Override
+    public void updateShoppingcart(Shopingcart shopingcart) {
+        getHibernateTemplate().update(shopingcart);
+    }
 }

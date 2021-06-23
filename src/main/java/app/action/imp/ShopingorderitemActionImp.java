@@ -53,8 +53,8 @@ public class ShopingorderitemActionImp extends ActionSupport implements Shopingo
         JSONArray jsonArray = new JSONArray();
         for(Shopingorderitem s : list){
             JSONObject jsonObject = new JSONObject();
-            jsonObject.put("ShopingOrderItemId", s.getShopingOrderItemId());
-            jsonObject.put("ShopingOrderId", s.getShopingorder().getShopingOrderId());
+            jsonObject.put("ShopingOrderItemID", s.getShopingOrderItemId());
+            jsonObject.put("ShopingOrderID", s.getShopingorder().getShopingOrderId());
             jsonObject.put("BuyNum", s.getBuyNum());
             Device dev = s.getDevice();
             JSONObject jsonDev = new JSONObject();
